@@ -16,7 +16,10 @@ from matplotlib import cm
 
 
 # ── 1. Load and prepare data ──────────────────────────────────────────────────
-diabetes_df = pd.read_csv("diabetes.csv")
+import os
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+diabetes_df = pd.read_csv(os.path.join(script_dir, "../datasets/diabetes.csv"))
 
 X = diabetes_df.drop("glucose", axis=1).values
 y = diabetes_df["glucose"].values
@@ -24,6 +27,7 @@ y = diabetes_df["glucose"].values
 X_bmi = X[:, 3]  # BMI column (4th feature)
 
 n = len(y)
+
 
 # ── 2. Define MSE function ───────────────────────────────────────────────────
 def mse(beta0, beta1, x, y):
@@ -81,7 +85,9 @@ def gradient_descent(x, y, learning_rate=0.0001, n_iterations=200):
 # ── 4. Run gradient descent ──────────────────────────────────────────────────
 lr = 0.0001
 n_iter = 200
-b0_hist, b1_hist, mse_hist = gradient_descent(X_bmi, y, learning_rate=lr, n_iterations=n_iter)
+b0_hist, b1_hist, mse_hist = gradient_descent(
+    X_bmi, y, learning_rate=lr, n_iterations=n_iter
+)
 
 print(f"Gradient Descent results (lr={lr}, iterations={n_iter}):")
 print(f"  β0 final = {b0_hist[-1]:.4f}")
@@ -114,14 +120,39 @@ ax1.plot_surface(B0, B1, Z, cmap=cm.coolwarm, alpha=0.6, edgecolor="none")
 
 # Gradient descent path on the surface
 mse_on_surface = np.array([mse(b0, b1, X_bmi, y) for b0, b1 in zip(b0_hist, b1_hist)])
-ax1.plot(b0_hist, b1_hist, mse_on_surface, color="black", linewidth=2, label="Gradient Descent Path")
-ax1.scatter(b0_hist[0], b1_hist[0], mse_on_surface[0], color="green", s=100, zorder=5, label="Start")
-ax1.scatter(b0_hist[-1], b1_hist[-1], mse_on_surface[-1], color="red", s=100, zorder=5, label="End")
+ax1.plot(
+    b0_hist,
+    b1_hist,
+    mse_on_surface,
+    color="black",
+    linewidth=2,
+    label="Gradient Descent Path",
+)
+ax1.scatter(
+    b0_hist[0],
+    b1_hist[0],
+    mse_on_surface[0],
+    color="green",
+    s=100,
+    zorder=5,
+    label="Start",
+)
+ax1.scatter(
+    b0_hist[-1],
+    b1_hist[-1],
+    mse_on_surface[-1],
+    color="red",
+    s=100,
+    zorder=5,
+    label="End",
+)
 
 ax1.set_xlabel("β₀ (Intercept)", fontsize=10)
 ax1.set_ylabel("β₁ (Slope)", fontsize=10)
 ax1.set_zlabel("MSE", fontsize=10)
-ax1.set_title("MSE Surface — Gradient Descent\n(Linear Regression: Glucose ~ BMI)", fontsize=12)
+ax1.set_title(
+    "MSE Surface — Gradient Descent\n(Linear Regression: Glucose ~ BMI)", fontsize=12
+)
 ax1.legend(fontsize=8)
 
 # ── 7. Plot 2: Contour Plot with Gradient Descent Path ───────────────────────
@@ -130,13 +161,39 @@ contour = ax2.contourf(B0, B1, Z, levels=50, cmap=cm.coolwarm)
 fig.colorbar(contour, ax=ax2, label="MSE")
 ax2.contour(B0, B1, Z, levels=20, colors="white", linewidths=0.3, alpha=0.5)
 
-ax2.plot(b0_hist, b1_hist, color="black", linewidth=1.5, marker="o", markersize=3, label="Gradient Descent Path")
-ax2.scatter(b0_hist[0], b1_hist[0], color="green", s=100, zorder=5, edgecolors="white", label="Start")
-ax2.scatter(b0_hist[-1], b1_hist[-1], color="red", s=100, zorder=5, edgecolors="white", label="End")
+ax2.plot(
+    b0_hist,
+    b1_hist,
+    color="black",
+    linewidth=1.5,
+    marker="o",
+    markersize=3,
+    label="Gradient Descent Path",
+)
+ax2.scatter(
+    b0_hist[0],
+    b1_hist[0],
+    color="green",
+    s=100,
+    zorder=5,
+    edgecolors="white",
+    label="Start",
+)
+ax2.scatter(
+    b0_hist[-1],
+    b1_hist[-1],
+    color="red",
+    s=100,
+    zorder=5,
+    edgecolors="white",
+    label="End",
+)
 
 ax2.set_xlabel("β₀ (Intercept)", fontsize=10)
 ax2.set_ylabel("β₁ (Slope)", fontsize=10)
-ax2.set_title("Contour Plot — Gradient Descent\n(Linear Regression: Glucose ~ BMI)", fontsize=12)
+ax2.set_title(
+    "Contour Plot — Gradient Descent\n(Linear Regression: Glucose ~ BMI)", fontsize=12
+)
 ax2.legend(fontsize=8)
 
 plt.tight_layout()
